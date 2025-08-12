@@ -76,10 +76,10 @@ cd sonar-rock-mine-detection
 
 2. **Install dependencies**
 ```bash
-pip install -r requirements.txt
+pip install 
 ```
 
-3. **Open Jupyter Notebook**
+3. **Open Jupyter Notebook or Vscode**
 ```bash
 jupyter notebook sonarproject.ipynb
 ```
