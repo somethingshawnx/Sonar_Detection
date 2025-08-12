@@ -17,7 +17,7 @@ This project implements a binary classification system to distinguish between ro
 
 ## 🔄 Project Workflow
 
-
+https://github.com/somethingshawnx/Sonar_Detection/blob/ddb23007fd021759a301b56120e0206416d3ce51/flowchart.png
 
 ```
 Sonar Data → Data Preprocessing → Train-Test Split → Logistic Regression Model
