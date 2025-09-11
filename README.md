@@ -149,14 +149,52 @@ input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
 prediction = model.predict(input_data_reshaped)
 ```
 
+## 🌐 Web Application
+
+The project now includes a modern web interface for real-time sonar data classification!
+
+### Features
+- **Interactive Input Form**: Enter 60 sonar feature values with validation
+- **Real-time Classification**: Get instant Rock vs Mine predictions
+- **Confidence Scores**: View prediction probabilities and confidence levels
+- **Sample Data**: Test the model with pre-loaded sample data
+- **Model Performance**: View training and testing accuracy metrics
+- **Responsive Design**: Works on desktop and mobile devices
+
+### Quick Start
+
+1. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+2. **Run the web application**:
+```bash
+python app.py
+# OR
+python run_web_app.py
+```
+
+3. **Open your browser** and go to: `http://localhost:5000`
+
+### Web Interface Usage
+
+1. **Input Data**: Enter 60 sonar feature values (0.0 to 1.0) in the input form
+2. **Classify**: Click "Classify Object" to get the prediction
+3. **View Results**: See the classification result with confidence scores
+4. **Try Samples**: Use the sample data buttons to test with known examples
+5. **Clear**: Reset all inputs to start over
+
 ## 🎯 Future Enhancements
 
+- [x] ✅ Create a web interface for real-time predictions
+- [x] ✅ Add data visualization for better insights
 - [ ] Implement cross-validation for better model evaluation
 - [ ] Try other algorithms (SVM, Random Forest, Neural Networks)
 - [ ] Add feature selection techniques
 - [ ] Implement hyperparameter tuning
-- [ ] Create a web interface for real-time predictions
-- [ ] Add data visualization for better insights
+- [ ] Add data export functionality
+- [ ] Implement batch prediction for multiple samples
 
 ## 📝 Lessons Learned
 

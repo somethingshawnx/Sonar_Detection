@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonar Rock vs Mine Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .input-section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .feature-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .feature-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-input label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #718096;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .feature-input input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .result-section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-card.rock {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .result-card.mine {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .confidence {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .probabilities {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .prob-item {
+            text-align: center;
+        }
+
+        .prob-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .prob-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .model-info {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .model-info h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .sample-data {
+            background: #e6fffa;
+            border: 2px solid #81e6d9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .sample-data h4 {
+            color: #234e52;
+            margin-bottom: 10px;
+        }
+
+        .sample-btn {
+            background: #38b2ac;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .sample-btn:hover {
+            background: #319795;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .feature-inputs {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-satellite-dish"></i> Sonar Detection System</h1>
+            <p>AI-Powered Rock vs Mine Classification using Logistic Regression</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card input-section">
+                <h2><i class="fas fa-edit"></i> Input Sonar Data</h2>
+                <p style="color: #718096; margin-bottom: 20px;">
+                    Enter 60 sonar feature values (0.0 to 1.0) to classify the object as Rock or Mine
+                </p>
+                
+                <div class="feature-inputs" id="featureInputs">
+                    <!-- Feature inputs will be generated by JavaScript -->
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="predict()" id="predictBtn">
+                        <i class="fas fa-search"></i> Classify Object
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearInputs()">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing sonar data...</p>
+                </div>
+
+                <div class="error" id="error"></div>
+
+                <div class="sample-data">
+                    <h4><i class="fas fa-flask"></i> Try Sample Data</h4>
+                    <p style="color: #234e52; margin-bottom: 10px; font-size: 0.9rem;">
+                        Click a button below to load sample data for testing
+                    </p>
+                    <button class="sample-btn" onclick="loadSampleData(0)">Sample 1 (Rock)</button>
+                    <button class="sample-btn" onclick="loadSampleData(1)">Sample 2 (Mine)</button>
+                    <button class="sample-btn" onclick="loadSampleData(2)">Sample 3 (Mixed)</button>
+                </div>
+            </div>
+
+            <div class="card result-section">
+                <h2><i class="fas fa-chart-line"></i> Classification Result</h2>
+                
+                <div class="result-card" id="resultCard">
+                    <div class="result-icon" id="resultIcon"></div>
+                    <div class="result-text" id="resultText"></div>
+                    <div class="confidence" id="confidence"></div>
+                    <div class="probabilities" id="probabilities"></div>
+                </div>
+
+                <div class="model-info">
+                    <h3><i class="fas fa-info-circle"></i> Model Performance</h3>
+                    <div class="info-grid" id="modelInfo">
+                        <!-- Model info will be loaded by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the feature inputs
+        function initializeInputs() {
+            const container = document.getElementById('featureInputs');
+            for (let i = 0; i < 60; i++) {
+                const inputDiv = document.createElement('div');
+                inputDiv.className = 'feature-input';
+                inputDiv.innerHTML = `
+                    <label>F${i + 1}</label>
+                    <input type="number" id="feature${i}" min="0" max="1" step="0.0001" placeholder="0.0000">
+                `;
+                container.appendChild(inputDiv);
+            }
+        }
+
+        // Load sample data
+        async function loadSampleData(sampleIndex) {
+            try {
+                const response = await fetch('/sample_data');
+                const data = await response.json();
+                
+                if (data.samples && data.samples[sampleIndex]) {
+                    const sample = data.samples[sampleIndex];
+                    for (let i = 0; i < 60; i++) {
+                        document.getElementById(`feature${i}`).value = sample.features[i].toFixed(4);
+                    }
+                    showError('');
+                }
+            } catch (error) {
+                showError('Failed to load sample data: ' + error.message);
+            }
+        }
+
+        // Clear all inputs
+        function clearInputs() {
+            for (let i = 0; i < 60; i++) {
+                document.getElementById(`feature${i}`).value = '';
+            }
+            hideResult();
+            showError('');
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = message ? 'block' : 'none';
+        }
+
+        // Hide result card
+        function hideResult() {
+            document.getElementById('resultCard').style.display = 'none';
+        }
+
+        // Show result card
+        function showResult(prediction, confidence, probabilities) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultText = document.getElementById('resultText');
+            const confidenceDiv = document.getElementById('confidence');
+            const probabilitiesDiv = document.getElementById('probabilities');
+
+            // Set result content
+            if (prediction === 'Rock') {
+                resultCard.className = 'result-card rock';
+                resultIcon.innerHTML = '<i class="fas fa-mountain"></i>';
+                resultText.textContent = 'ROCK DETECTED';
+            } else {
+                resultCard.className = 'result-card mine';
+                resultIcon.innerHTML = '<i class="fas fa-bomb"></i>';
+                resultText.textContent = 'MINE DETECTED';
+            }
+
+            confidenceDiv.textContent = `Confidence: ${confidence}%`;
+            
+            probabilitiesDiv.innerHTML = `
+                <div class="prob-item">
+                    <div class="prob-value">${probabilities.Rock}%</div>
+                    <div class="prob-label">Rock</div>
+                </div>
+                <div class="prob-item">
+                    <div class="prob-value">${probabilities.Mine}%</div>
+                    <div class="prob-label">Mine</div>
+                </div>
+            `;
+
+            resultCard.style.display = 'block';
+        }
+
+        // Make prediction
+        async function predict() {
+            const predictBtn = document.getElementById('predictBtn');
+            const loading = document.getElementById('loading');
+            
+            // Validate inputs
+            const features = [];
+            let isValid = true;
+            
+            for (let i = 0; i < 60; i++) {
+                const value = document.getElementById(`feature${i}`).value;
+                if (value === '' || isNaN(value) || value < 0 || value > 1) {
+                    isValid = false;
+                    break;
+                }
+                features.push(parseFloat(value));
+            }
+
+            if (!isValid) {
+                showError('Please enter valid values (0.0 to 1.0) for all 60 features');
+                return;
+            }
+
+            // Show loading state
+            predictBtn.disabled = true;
+            loading.style.display = 'block';
+            hideResult();
+            showError('');
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ features: features })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult(data.prediction, data.confidence, data.probabilities);
+                } else {
+                    showError(data.error || 'Prediction failed');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                predictBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // Load model information
+        async function loadModelInfo() {
+            try {
+                const response = await fetch('/model_info');
+                const data = await response.json();
+                
+                const modelInfoDiv = document.getElementById('modelInfo');
+                modelInfoDiv.innerHTML = `
+                    <div class="info-item">
+                        <div class="info-value">${(data.training_accuracy * 100).toFixed(1)}%</div>
+                        <div class="info-label">Training Accuracy</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${(data.testing_accuracy * 100).toFixed(1)}%</div>
+                        <div class="info-label">Testing Accuracy</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${data.training_samples}</div>
+                        <div class="info-label">Training Samples</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${data.testing_samples}</div>
+                        <div class="info-label">Testing Samples</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${data.total_features}</div>
+                        <div class="info-label">Features</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${data.model_type}</div>
+                        <div class="info-label">Algorithm</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load model info:', error);
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInputs();
+            loadModelInfo();
+        });
+    </script>
+</body>
+</html>
