@@ -362,14 +362,19 @@ class WebHandler(BaseHTTPRequestHandler):
             const confidenceDiv = document.getElementById('confidence');
             const probabilitiesDiv = document.getElementById('probabilities');
 
-            if (prediction === 'Rock') {
-                resultCard.className = 'result-card rock';
-                resultIcon.textContent = '🏔️';
-                resultText.textContent = 'ROCK DETECTED';
-            } else {
+            // Decide styling based on probabilities (Mine red if Mine >= Rock)
+            const isMineDominant = (typeof probabilities?.Mine === 'number' && typeof probabilities?.Rock === 'number')
+                ? (probabilities.Mine >= probabilities.Rock)
+                : (prediction !== 'Rock');
+
+            if (isMineDominant) {
                 resultCard.className = 'result-card mine';
                 resultIcon.textContent = '💣';
                 resultText.textContent = 'MINE DETECTED';
+            } else {
+                resultCard.className = 'result-card rock';
+                resultIcon.textContent = '🏔️';
+                resultText.textContent = 'ROCK DETECTED';
             }
 
             confidenceDiv.textContent = `Confidence: ${confidence}%`;
